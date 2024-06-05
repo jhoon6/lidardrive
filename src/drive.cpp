@@ -18,7 +18,7 @@
 
 const int def_speed = 100;
 const float k = 70.f;
-const int horizontalWallDetectionScore = 700;
+const int horizontalWallDetectionScore = 750;
 
 float calc_point(float distance) {
     if (distance == 0) return 10.0;
@@ -28,6 +28,7 @@ float calc_point(float distance) {
 static void scanCb(rclcpp::Node::SharedPtr node, sensor_msgs::msg::LaserScan::SharedPtr scan) {
   static auto qos_profile = rclcpp::QoS(rclcpp::KeepLast(10));
   static auto mypub = node->create_publisher<geometry_msgs::msg::Vector3>("/topic_dxlpub", qos_profile);
+  static cv::Point center(250, 250);
 
   int count = scan->scan_time / scan->time_increment;
   printf("[SLLIDAR INFO]: I heard a laser scan %s[%d]:\n", scan->header.frame_id.c_str(), count);
@@ -70,16 +71,25 @@ static void scanCb(rclcpp::Node::SharedPtr node, sensor_msgs::msg::LaserScan::Sh
   float add = abs(scoreFrontLeft - scoreFrontRight) / k;
   printf("절댓값: %f\n", add);
 
-  if (add < 7 && scoreFrontLeft >= horizontalWallDetectionScore && scoreFrontRight >= horizontalWallDetectionScore) {
+  if (add < 7 && scoreFrontLeft >= horizontalWallDetectionScore && scoreFrontRight >= horizontalWallDetectionScore)
+  {
     printf("벽 감지!\n");
-    add = 50;
+    add = 80;
   }
+
+  float add_plot;
+  if (add >= 90.f) add_plot = 90.f;
+  else add_plot = add; 
 
   if (scoreFrontLeft > scoreFrontRight){
     printf("좌가 점수많음 %f %f\n", scoreFrontLeft, scoreFrontRight);
+    cv::Point arrow_end(center.x + 100 * cos((90.f - add_plot) * CV_PI / 180), center.y - 100 * sin((90.f - add_plot) * CV_PI / 180));
+    cv::arrowedLine(img, center, arrow_end, cv::Scalar(255, 255, 0), 1);
   } 
   else if (scoreFrontLeft <= scoreFrontRight) {
     printf("우가 점수많음 %f %f\n", scoreFrontLeft, scoreFrontRight);
+    cv::Point arrow_end(center.x + 100 * cos((90.f + add_plot) * CV_PI / 180), center.y - 100 * sin((90.f + add_plot) * CV_PI / 180));
+    cv::arrowedLine(img, center, arrow_end, cv::Scalar(255, 255, 0), 1);
     add = -1 * add;
   } 
 
