@@ -21,7 +21,7 @@ const float k = 70.f;
 const int horizontalWallDetectionScore = 750;
 
 float calc_point(float distance) {
-    if (distance == 0) return 10.0;
+    if (distance < 0.1) return 100.0;
     return 10.0 / distance;
 }
 
