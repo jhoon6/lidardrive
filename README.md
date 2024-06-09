@@ -1,6 +1,6 @@
 # 젯슨 나노를 이용한 라이다 장애물 회피 주행 노드
 
-![젯슨 나노 봇 사진](https://files.catbox.moe/i01txv.png)
+![젯슨 나노 봇 webp 영상](https://files.catbox.moe/tt1ikn.webp)
 
 https://github.com/Slamtec/sllidar_ros2 
 sllidar_node 를 이용하여 토픽 통신으로 라이다 데이터를 구독하고
